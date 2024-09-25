@@ -24,17 +24,19 @@ static String generateKey(String str, String key)
 static String cipherText(String str, String key)
 {
     String cipher_text="";
-
+    int arr[] = new int[str.length()];
+    
+    
     for (int i = 0; i < str.length(); i++)
     {
         // converting in range 0-25
         int x = ((str.charAt(i)-'A') ^ (key.charAt(i)-'A'));
-        if(x > 25) {
-            x = x%26;
-        }
-        // int x = (str.charAt(i) + key.charAt(i)) %26;
+
+        // Converting to int to char
         x += 'A';
         cipher_text+=(char)(x);
+        
+        
     }
     return cipher_text;
 }
@@ -50,14 +52,7 @@ static String originalText(String cipher_text, String key)
     {
         // converting in range 0-25
         //  int x = (cipher_text.charAt(i));
-        
-
         int x = ((cipher_text.charAt(i)-'A') ^ (key.charAt(i)-'A'));
-                    
-        if(x > 25) {
-            x = x%26;
-        }
-        
 
         // convert into alphabets(ASCII)
         x += 'A';
@@ -84,19 +79,24 @@ static String LowerToUpper(String s)
 // Driver code
 public static void main(String[] args) 
 {
-    String Str = "GEEKSFORGEEKS";
-    String Keyword = "AYUSH";
-      
-      String str = LowerToUpper(Str);
-      String keyword = LowerToUpper(Keyword);
+    // String Str = "GEEKSFORGEEKS";
+    // String Keyword = "AYUSH";
+    String Str = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    String Keyword = "";
+     
+     for(int i=13; i<26; i++) {
+          Keyword = "";
+        String str = LowerToUpper(Str);
+        String keyword = LowerToUpper(Keyword + str.charAt(i));
 
-    String key = generateKey(str, keyword);
-    String cipher_text = cipherText(str, key);
 
-    System.out.println("Ciphertext : "
-        + cipher_text + "\n");
-
-    System.out.println("Original/Decrypted Text : "
-        + originalText(cipher_text, key));
+        String key = generateKey(str, keyword);
+        String cipher_text = cipherText(str, key);
+    
+        System.out.print("i: " + i + ",  Keyword: " + keyword + "\n");
+        System.out.println("C: " + cipher_text);
+        System.out.println("P: " + originalText(cipher_text, key) + "\n");
+        
+        }
     }
 }
