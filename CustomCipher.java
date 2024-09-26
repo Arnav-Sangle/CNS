@@ -54,20 +54,6 @@ class CustomCipher {
         return plaintext;
     }
     
-    static String LowerToUpper(String s)
-    {
-        StringBuffer str =new StringBuffer(s); 
-        for(int i = 0; i < s.length(); i++)
-        {
-            if(Character.isLowerCase(s.charAt(i)))
-            {
-                str.setCharAt(i, Character.toUpperCase(s.charAt(i)));
-            }
-        }
-        s = str.toString();
-        return s;
-    }
-    
     
     
     // Main
@@ -83,8 +69,8 @@ class CustomCipher {
         // String Str = "This is a Secret Message";
         // String Keyword = "Secret";
          
-        String str = LowerToUpper(Str);
-        String keyword = LowerToUpper(Keyword);
+        String str = Str;
+        String keyword = Keyword;
     
         String key = generateKey(str, keyword);
         String cipherText = Encrypt(str, key);
