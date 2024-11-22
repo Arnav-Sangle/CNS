@@ -1,0 +1,40 @@
+import os
+
+def vernam_encrypt(plaintext, key):
+    ciphertext = ''
+    for pt_char, key_char in zip(plaintext, key):
+        ciphertext += chr(ord(pt_char) ^ ord(key_char))
+            
+    # ciphertext = ''.join(
+    #     chr(ord(pt_char) ^ ord(key_char)) for pt_char, key_char in zip(plaintext, key)
+    # )
+
+    return ciphertext
+
+# def generate_key(length):
+#     return ''.join(chr(os.urandom(1)[0] % 256) for _ in range(length))
+
+def vernam_decrypt(ciphertext, key):
+    plaintext = ''
+    for ct_char, key_char in zip(ciphertext, key):
+        plaintext += chr(ord(ct_char) ^ ord(key_char)) 
+
+    # plaintext = ''.join(
+    #     chr(ord(ct_char) ^ ord(key_char)) for ct_char, key_char in zip(ciphertext, key)
+    # )
+
+    return plaintext
+
+
+# MAIN CODE
+plaintext = "HELLO"
+# key = generate_key(len(plaintext))  # Generate a random key of the same length as plaintext
+key = "GAMER"
+print("Plaintext:", plaintext)
+print("Key:      ", key)
+
+ciphertext = vernam_encrypt(plaintext, key)
+print("Ciphertext:", ciphertext)
+
+decrypted_text = vernam_decrypt(ciphertext, key)
+print("Decrypted Text:", decrypted_text)

@@ -1,0 +1,57 @@
+import socket
+
+# XOR-based decryption
+def xor_decrypt(data, key):
+    decrypted_data = bytearray()
+    key_len = len(key)
+    for i in range(len(data)):
+        decrypted_data.append(data[i] ^ key[i % key_len])
+    return decrypted_data
+
+def start_server():
+    server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    server_socket.bind(('localhost', 4455))
+    server_socket.listen(1)
+    print("Server is listening for connections...")
+
+    conn, addr = server_socket.accept()
+    print(f"Connection from {addr} established.")
+
+    #The recv() call might combine multiple pieces of data (key, image size, encrypted image).
+    #So Flush the socket properly, use strip()
+
+    # Read key and size as plain text
+    text_data = conn.recv(1024).decode().strip()
+    key, size_data = text_data.split("\n")
+    print(f"\nReceived Key: {key}")
+    image_size = int(size_data)
+    print(f"Expected Image Size: {image_size} bytes")
+
+    # Receive encrypted image data
+    encrypted_image_data = bytearray()
+    while len(encrypted_image_data) < image_size:
+        chunk = conn.recv(4096)
+        if not chunk:
+            break
+        encrypted_image_data.extend(chunk)
+
+    print("\nEncrypted image data received.")
+    
+    # print(f"Encrypted Image: {encrypted_image_data}")
+    print("First 200 bytes of encrypted data (as hex):")
+    for i in range(min(500, len(encrypted_image_data))):
+        print(f"{encrypted_image_data[i]:02x}", end='')
+
+    # Decrypt the image
+    decrypted_image_data = xor_decrypt(encrypted_image_data, key.encode())
+
+    # Save the decrypted image
+    with open("received_image.png", "wb") as image_file:
+        image_file.write(decrypted_image_data)
+    print("\n\nDecrypted image saved as 'received_image.png'.")
+    
+
+    conn.close()
+
+if __name__ == "__main__":
+    start_server()

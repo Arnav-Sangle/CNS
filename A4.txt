@@ -1,0 +1,139 @@
+import random
+
+# Function to check if a number is prime
+def is_prime(num):
+    if num < 2:
+        return False
+    for i in range(2, int(num**0.5) + 1):
+        if num % i == 0:
+            return False
+    return True
+
+# Generate a large prime number (for simplicity, using a small one here)
+def generate_large_prime():
+    while True:
+        prime = random.randint(1000, 5000)  # Replace with larger range for real use
+        if is_prime(prime):
+            return prime
+
+# Function to find a primitive root modulo p
+def find_primitive_root(p):
+    for g in range(2, p):
+        seen = set()
+        for power in range(1, p):
+            mod_result = pow(g, power, p)
+            if mod_result in seen:
+                break
+            seen.add(mod_result)
+        else:
+            return g
+    return None
+
+print(f"\n------------------------------------------------------------------------------------------\n")
+
+print(f" STEP 1 - generation of prime & generator : G, P\n")
+
+P = generate_large_prime()
+print(f" Large prime P = {P} is generated")
+G = find_primitive_root(P)
+print(f" Generator G = {G} is generated")
+
+print(f"\n------------------------------------------------------------------------------------------\n")
+
+print(f" STEP 2 - generation of private keys : a, b\n")
+
+a = random.randint(2, P-2)
+print(f" ALICE Generates private key a = {a}")
+b = random.randint(2, P-2)
+print(f" BOB Generates private key b = {b}")
+
+print(f"\n------------------------------------------------------------------------------------------\n")
+
+print(f" STEP 3 - generation of public keys : A, B\n")
+
+A = pow(G, a, P)
+B = pow(G, b, P)
+
+# print(f" A (G, P, a) = G^a % P = {A}")
+# print(f" B (G, P, b) = G^b % P = {B}\n")
+
+print(f" ALICE Generates public key A = {A}")
+print(f" BOB Generates public key B = {B}")
+
+print(f"\n------------------------------------------------------------------------------------------\n")
+
+print(f" STEP 4 - Sending public keys\n")
+
+print(f" ALICE sends public key A = {A} over the network, to BOB")
+print(f" BOB sends public key B = {B} over the network, to ALICE")
+
+print(f"\n------------------------------------------------------------------------------------------\n")
+
+print(f" STEP 5 - Eve Intercepts and switches the public keys\n")
+
+print(f" Eve generates false private keys\n")
+
+c = random.randint(2, P-2)
+d = random.randint(2, P-2)
+
+C = pow(G, c, P)
+D = pow(G, d, P)
+
+# C (G, P, c) = G^c % P
+# D (G, P, d) = G^d % P 
+
+print(f" EVE already knows public values G and P\n")
+
+print(f" EVE Generates false private keys c = {c} and d = {d}\n")
+
+print(f" EVE Generates public key C = {C}")
+print(f" EVE Generates public key D = {D}\n")
+
+print(f" EVE intercepts public key A going from ALICE -> BOB")
+print(f" EVE replaces intercepted public key A = {A} with C = {C}")
+print(f" BOB recievs C instead of A\n")
+
+print(f" EVE intercepts public key B going from BOB -> ALICE")
+print(f" EVE replaces intercepted public key B = {B} with D = {D}")
+print(f" ALICE recieves D instead of B")
+
+print(f"\n------------------------------------------------------------------------------------------\n")
+
+print(f" STEP 6 - generation of secret shared keys\n")
+
+Sa = pow(B, a, P)
+Sb = pow(A, b, P)
+
+S1 = pow(D, a, P)
+S2 = pow(C, b, P)
+
+S12 = pow(A, d, P)
+S22 = pow(B, c, P)
+
+# Alice
+# S1 (D, a, P) = D^a % P 
+# S (B, a, P) = B^a % P 
+
+# Bob
+# S2 (C, b, P) = C^b % P 
+# S (A, b, P) = A^b % P 
+
+# Eve
+# S1' (A, d, P) = A^d % P 
+# S2' (B, c, P) = B^c % P 
+
+print(f" ALICE generates False Shared Secret key S1 = {S1}")
+print(f" isntead of True Shared Secret key S = {Sa}\n")
+
+print(f" BOB generates False Shared Secret key S2 = {S2}")
+print(f" isntead of True Shared Secret key S = {Sb}\n")
+
+print(f" EVE generates False Shared Secret key S1 = {S12}")
+print(f" EVE generates False Shared Secret key S2 = {S22}\n")
+
+print(f" ALICE and BOB do not share secret key S")
+print(f" EVE now shares Secret key S1 with ALICE")
+print(f" EVE now shares Secret key S2 with BOB")
+print(f" EVE can now listen to or even modify conversation between ALICE and BOB")
+
+print(f"\n------------------------------------------------------------------------------------------\n")

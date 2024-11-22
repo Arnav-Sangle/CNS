@@ -1,0 +1,46 @@
+
+import socket
+import timeit
+
+# Utility Functions
+
+def rsa_encrypt(message, public_key):
+    e, n = public_key
+    return [pow(ord(char), e, n) for char in message]
+
+# Client Code
+def start_client():
+
+    # Set up socket
+    client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    client_socket.connect(('localhost', 4455))
+    print(f"\nConnection successfully established with Server")
+
+    # Receive server's public key
+    server_public_key = eval(client_socket.recv(4096).decode())
+    print("Received Server Public Key:", server_public_key)
+
+    # Input message
+    message = input("\nEnter the message to be sent: ")
+
+    # Encrypt the message with server's public key
+    startTime = timeit.default_timer()
+    encrypted_message = rsa_encrypt(message, server_public_key)
+    endTime = timeit.default_timer()
+    encrypt_time = f"{(endTime - startTime):.3e}".replace("e", " e")
+
+    encrypt_time_message = f"Encryption time = {encrypt_time}"
+    print(encrypt_time_message)
+
+    # Send encrypted message and encryption time
+    client_socket.sendall(str(encrypted_message).encode())
+    client_socket.sendall(str(encrypt_time_message).encode())
+
+    # Receive server's response
+    response = client_socket.recv(4096).decode()
+    print(f"\nServer Response: {response}\n")
+
+    client_socket.close()
+
+if __name__ == "__main__":
+    start_client()

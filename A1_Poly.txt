@@ -1,0 +1,55 @@
+def polyalphabetic_encrypt(plaintext, key):
+    ciphertext = []
+    key = key.upper()
+    key_index = 0
+
+    for char in plaintext:
+        if char.isalpha():  # Encrypt only alphabetic characters
+            shift = ord(key[key_index]) - ord('A')  # Calculate shift
+            if char.isupper():
+                ciphertext.append(chr((ord(char) - ord('A') + shift) % 26 + ord('A')))
+            else:
+                ciphertext.append(chr((ord(char) - ord('a') + shift) % 26 + ord('a')))
+            key_index = (key_index + 1) % len(key)  # Cycle through key
+        else:
+            ciphertext.append(char)  # Keep non-alphabetic characters unchanged
+
+    return ''.join(ciphertext)
+
+
+def polyalphabetic_decrypt(ciphertext, key):
+    plaintext = []
+    key = key.upper()
+    key_index = 0
+
+    for char in ciphertext:
+        if char.isalpha():  # Decrypt only alphabetic characters
+            shift = ord(key[key_index]) - ord('A')  # Calculate shift
+            if char.isupper():
+                plaintext.append(chr((ord(char) - ord('A') - shift + 26) % 26 + ord('A')))
+            else:
+                plaintext.append(chr((ord(char) - ord('a') - shift + 26) % 26 + ord('a')))
+            key_index = (key_index + 1) % len(key)  # Cycle through key
+        else:
+            plaintext.append(char)  # Keep non-alphabetic characters unchanged
+
+    return ''.join(plaintext)
+
+# Example Usage
+plaintext = "Secret Message"
+key = "Clue"
+ciphertext = polyalphabetic_encrypt(plaintext, key)
+decrypted_text = polyalphabetic_decrypt(ciphertext, key)
+
+print("Plaintext:", plaintext)
+print("Key:      ", key)
+print("Ciphertext:", ciphertext)
+print("Decrypted:", decrypted_text)
+
+'''
+TC = O(n) both encryption and decryption
+Adv:
+    - resists frequency analysis because multiple letters map to each plaintext letter
+    - long key --> increased strength
+
+'''

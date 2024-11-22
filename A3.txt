@@ -1,0 +1,59 @@
+class CustomCipher: 
+    @staticmethod
+    def generate_key(string, key):
+        """
+        Repeats the key in a cyclic manner to match the length of the plaintext.
+        """
+        x = len(string)
+        key = list(key)
+        while len(key) < x:
+            key.append(key[len(key) % len(key)])
+        return ''.join(key)
+
+    @staticmethod
+    def encrypt(string, key):
+        """
+        Encrypts the plaintext using the provided key, applying a Caesar-like shift based on the key.
+        """
+        ciphertext = ""
+        for i in range(len(string)):
+            # XOR operation
+            xor_result = ord(string[i]) ^ ord(key[i])
+            # Shift based on the key element (Caesar cipher logic)
+            shift = ord(key[i].lower()) - ord('a')  # Using the alphabet position
+            encrypted_char = chr((xor_result + shift) % 256)  # Ensure the result fits in a byte
+            ciphertext += encrypted_char
+        return ciphertext
+
+    @staticmethod
+    def decrypt(ciphertext, key):
+        """
+        Decrypts the ciphertext using the provided key, reversing the Caesar shift and XOR.
+        """
+        plaintext = ""
+        for i in range(len(ciphertext)):
+            # Reverse the shift first
+            shift = ord(key[i].lower()) - ord('a')
+            xor_result = (ord(ciphertext[i]) - shift) % 256
+            # XOR operation to decrypt
+            decrypted_char = chr(xor_result ^ ord(key[i]))
+            plaintext += decrypted_char
+        return plaintext
+
+# Main function
+if __name__ == "__main__":
+    # Input plaintext and key from user
+    str_input = input("\n Enter PlainText    - ")
+    keyword_input = input(" Enter Keyword      - ")
+
+    # Generate key
+    key = CustomCipher.generate_key(str_input, keyword_input)
+
+    # Encrypt the plaintext
+    cipher_text = CustomCipher.encrypt(str_input, key)
+    hex_string = ''.join(f'{ord(c):02x}' for c in cipher_text)
+    print("\n Encrypted text     -", hex_string)
+
+    # Decrypt the ciphertext
+    decrypted_text = CustomCipher.decrypt(cipher_text, key)
+    print(" Decrypted text     -", decrypted_text,"\n")

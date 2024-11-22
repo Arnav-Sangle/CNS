@@ -1,0 +1,74 @@
+import random
+import timeit
+
+# Utility Functions
+def is_prime(num):
+    if num <= 1:
+        return False
+    for i in range(2, int(num**0.5) + 1):
+        if num % i == 0:
+            return False
+    return True
+
+def gcd(a, b):
+    while b != 0:
+        a, b = b, a % b
+    return a
+
+def mod_inverse(e, phi):
+    if gcd(e, phi) != 1:
+        return None
+    for d in range(1, phi):
+        if (e * d) % phi == 1:
+            return d
+    return None
+
+def generate_keypair():
+    p = q = 1
+    while not is_prime(p):
+        p = random.randint(100, 1000)
+    while not is_prime(q) or p == q:
+        q = random.randint(100, 1000)
+    n = p * q
+    phi = (p - 1) * (q - 1)
+    
+    e = random.randint(1, phi)   
+    while gcd(e, phi) != 1:
+        e = random.randint(1, phi)
+
+    d = mod_inverse(e, phi)
+
+    return ((e, n), (d, n))
+
+def rsa_encrypt(message, public_key):
+    e, n = public_key
+    return [pow(ord(char), e, n) for char in message]
+
+def rsa_decrypt(encrypted_message, private_key):
+    d, n = private_key
+    return ''.join([chr(pow(char, d, n)) for char in encrypted_message])
+
+
+# Generate RSA key pair
+public_key, private_key = generate_keypair()
+print("Public Key:", public_key)
+print("Private Key:", private_key)
+
+message = input("\nEnter Message: ")
+n = len(message)
+print(f"{n*8}-bit Message")
+
+start = timeit.default_timer()
+encrypted_message = rsa_encrypt(message, public_key)
+end = timeit.default_timer()
+encryptionTime = end - start
+print(f"\nEncrypted Message = {encrypted_message}")
+print(f"Encryption Time = {encryptionTime}")
+
+start = timeit.default_timer()
+decrypted_message = rsa_decrypt(encrypted_message, private_key)
+end = timeit.default_timer()
+decryptionTime = end - start
+print(f"\nDecrypted Message = {decrypted_message}")
+print(f"Decryption Time = {decryptionTime}")
+

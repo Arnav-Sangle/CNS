@@ -1,0 +1,40 @@
+import socket
+
+# XOR-based encryption
+def xor_encrypt(data, key):
+    encrypted_data = bytearray()
+    key_len = len(key)
+    for i in range(len(data)):
+        encrypted_data.append(data[i] ^ key[i % key_len])
+    return encrypted_data
+
+def start_client(image_path, key):
+    client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    client_socket.connect(('localhost', 4455))
+
+    # Read image data
+    with open(image_path, "rb") as image_file:
+        image_data = image_file.read()
+    
+    print("Image data loaded.")
+
+    # Encrypt image data
+    encrypted_image_data = xor_encrypt(image_data, key.encode())
+    print("Image data encrypted.")
+
+    # Send key and size as plain text with a delimiter
+    key_and_size = f"{key}\n{len(encrypted_image_data)}\n"
+    client_socket.sendall(key_and_size.encode())
+
+    # Send encrypted image data
+    client_socket.sendall(encrypted_image_data)
+    print("Encrypted image data sent.")
+
+    client_socket.close()
+
+if __name__ == "__main__":
+    # Path to the image to be sent
+    image_path = "image_to_send.png"
+    # Encryption key (must be shared with the server)
+    key = "simplekey"
+    start_client(image_path, key)

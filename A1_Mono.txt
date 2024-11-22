@@ -1,0 +1,58 @@
+def monoalphabetic_encrypt(plaintext, key):
+    # Define the alphabet manually
+    alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+
+    # Encrypt the plaintext
+    ciphertext = []
+    for char in plaintext.upper():
+        if char in alphabet:  # Only process alphabetic characters
+            # Find the position of the character in the alphabet
+            original_pos = alphabet.index(char)
+            # Find the character corresponding to the key's position
+            encrypted_char = key[original_pos]
+            ciphertext.append(encrypted_char)
+        else:
+            ciphertext.append(char)  # Non-alphabetic characters remain unchanged
+
+    return ''.join(ciphertext)  # Join list to form the string
+
+
+def monoalphabetic_decrypt(ciphertext, key):
+    # Define the alphabet manually
+    alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+
+    # Decrypt the ciphertext
+    plaintext = []
+    for char in ciphertext.upper():
+        if char in key:  # Only process alphabetic characters
+            # Find the position of the character in the key
+            key_pos = key.index(char)
+            # Find the corresponding character in the alphabet
+            decrypted_char = alphabet[key_pos]
+            plaintext.append(decrypted_char)
+        else:
+            plaintext.append(char)  # Non-alphabetic characters remain unchanged
+
+    return ''.join(plaintext)  # Join list to form the string
+
+
+# Example Usage
+key = "QAZWSXEDCRFVTGBYHNUJMIKOLP"  # Custom key for encryption, should be a permutation of the alphabet
+plaintext = "HELLO WORLD"
+
+# Encrypt
+ciphertext = monoalphabetic_encrypt(plaintext, key)
+print(f"Ciphertext: {ciphertext}")
+
+# Decrypt
+decrypted_text = monoalphabetic_decrypt(ciphertext, key)
+print(f"Decrypted Text: {decrypted_text}")
+
+'''
+TC: O(n); n = len(plain_text); lookup --> O(1); generate_key() --> O(1)
+Adv:
+    - needs 26! tries to crack
+Disadv:
+    - vulnerable to freq analysis
+    - once table is known cipher is completely broken
+'''

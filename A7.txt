@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login & Register</title>
+</head>
+<body>
+    <h2>Login/Register</h2>
+    <input type="text" id="username" placeholder="Username" required><br>
+    <input type="password" id="password" placeholder="Password" required><br>
+    <button onclick="register()">Register</button>
+    <button onclick="login()">Login</button>
+    <div id="message"></div>
+
+    <script>
+        // Global storage for user data (simulating a database)
+        const userDatabase = {};
+
+        // Generate a random salt
+        function generateSalt() {
+            return Math.random().toString(36).substring(2, 15);
+        }
+
+        // Hash the password with a salt using SHA-256
+        async function hashPassword(password, salt) {
+            const encoder = new TextEncoder();
+            const data = encoder.encode(password + salt);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+            return Array.from(new Uint8Array(hashBuffer))
+                        .map(byte => byte.toString(16).padStart(2, '0'))
+                        .join('');
+        }
+
+        // Register a new user
+        async function register() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            if (!username || !password) {
+                document.getElementById('message').innerText = "Please enter both username and password.";
+                return;
+            }
+
+            if (userDatabase[username]) {
+                document.getElementById('message').innerText = "User already exists!";
+                return;
+            }
+
+            const salt = generateSalt();
+            const hashedPassword = await hashPassword(password, salt);
+
+            // Store the salt and hashed password
+            userDatabase[username] = { salt, hashedPassword };
+
+            console.log("User Database after Registration:", userDatabase);
+            console.log(`Generated Hash for ${username}:`, hashedPassword);
+
+            document.getElementById('message').innerText = "Registration successful!";
+        }
+
+        // Login the user
+        async function login() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            if (!username || !password) {
+                document.getElementById('message').innerText = "Please enter both username and password.";
+                return;
+            }
+
+            const userData = userDatabase[username];
+            if (!userData) {
+                document.getElementById('message').innerText = "User not found!";
+                return;
+            }
+
+            const { salt, hashedPassword } = userData;
+            const enteredHash = await hashPassword(password, salt);
+
+            console.log(`Login Attempt for ${username}`);
+            console.log("Stored Hash:", hashedPassword);
+            console.log("Entered Hash:", enteredHash);
+
+            if (enteredHash === hashedPassword) {
+                document.getElementById('message').innerText = "Login successful!";
+            } else {
+                document.getElementById('message').innerText = "Invalid username or password.";
+            }
+        }
+    </script>
+</body>
+</html>

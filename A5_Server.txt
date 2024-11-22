@@ -1,0 +1,55 @@
+import socket
+import hashlib
+
+def generate_hash(message):
+    # Initialize variables (like hash states in SHA-1)
+    hash_value = 0
+
+    # Process each character in the message
+    for char in message:
+        # Convert character to Unicode integer
+        char_code = ord(char)
+        
+        # Simple bitwise operations to simulate "mixing" data
+        hash_value = (hash_value * 31 + char_code) & 0xFFFFFFFF  # Mod 2^32 to keep it in 32 bits
+        hash_value ^= (hash_value >> 16)  # XOR with shifted value to increase diffusion
+
+    # Convert to hexadecimal representation
+    return hex(hash_value)[2:].zfill(8)  # Pads to ensure 8 characters
+
+
+# Server configuration
+server_host = 'localhost'  # Use '0.0.0.0' to bind to all available interfaces
+server_port = 12345        # Arbitrary non-privileged port
+
+# Create and bind the server socket
+server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+server_socket.bind((server_host, server_port))
+server_socket.listen(1)
+
+print("Server is waiting for a connection...")
+
+# Wait for a client connection
+client_socket, client_address = server_socket.accept()
+print(f"Connection from {client_address} established.")
+
+# Receive the payload
+payload = client_socket.recv(1024).decode()
+received_message, received_hash = payload.split("|")
+print(f"Received Message: {received_message}")
+# received_hash = "df097af90"
+print(f"Received Hash: {received_hash}")
+
+# Compute hash of the received message
+computed_hash = generate_hash(received_message)
+print(f"Computed Hash: {computed_hash}")
+
+# Check integrity
+if computed_hash == received_hash:
+    print("Message integrity verified. Hashes match.")
+else:
+    print("Message integrity compromised. Hashes do not match.")
+
+# Close the connection
+client_socket.close()
+server_socket.close()
